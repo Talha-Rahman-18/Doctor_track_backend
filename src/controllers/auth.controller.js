@@ -13,9 +13,14 @@ const cookieBase = () => ({
 export async function login(req, res) {
   const user = await authService.authenticate(req.validated.body);
   const { token, expiresAt } = authService.signToken(user);
+  user.token = token;
 
   res.cookie(env.COOKIE_NAME, token, { ...cookieBase(), expires: expiresAt });
-  return sendSuccess(res, { message: "Logged in successfully", data: { user } });
+
+  return sendSuccess(res, {
+    message: "Logged in successfully",
+    data: { user },
+  });
 }
 
 export function logout(_req, res) {
@@ -24,5 +29,8 @@ export function logout(_req, res) {
 }
 
 export function me(req, res) {
-  return sendSuccess(res, { message: "Current user retrieved", data: { user: req.user } });
+  return sendSuccess(res, {
+    message: "Current user retrieved",
+    data: { user: req.user },
+  });
 }

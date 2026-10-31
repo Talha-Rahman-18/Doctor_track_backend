@@ -4,11 +4,29 @@ export const ROLES = Object.freeze({ ADMIN: "admin" });
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
-    email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254 },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 80,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      maxlength: 254,
+    },
     passwordHash: { type: String, required: true, select: false },
-    role: { type: String, enum: Object.values(ROLES), default: ROLES.ADMIN, required: true },
+    role: {
+      type: String,
+      enum: Object.values(ROLES),
+      default: ROLES.ADMIN,
+      required: true,
+    },
     isActive: { type: Boolean, default: true },
+    token: { type: String },
   },
   {
     timestamps: true,

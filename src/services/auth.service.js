@@ -9,19 +9,33 @@ const JWT_AUDIENCE = "doctor-tracker-admin";
 const JWT_ALGORITHM = "HS256";
 
 // Compared against when the email is unknown so response time does not reveal which emails exist.
-const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", Math.min(env.BCRYPT_ROUNDS, 10));
+const DUMMY_HASH = bcrypt.hashSync(
+  "not-a-real-password",
+  Math.min(env.BCRYPT_ROUNDS, 10),
+);
 
-export const hashPassword = (password) => bcrypt.hash(password, env.BCRYPT_ROUNDS);
+export const hashPassword = (password) =>
+  bcrypt.hash(password, env.BCRYPT_ROUNDS);
 
 export async function authenticate({ email, password }) {
-  const user = await User.findOne({ email }).select("+passwordHash").maxTimeMS(5000);
-  const passwordMatches = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
+  const user = await User.findOne({ email })
+    .select("+passwordHash")
+    .maxTimeMS(5000);
+  const passwordMatches = await bcrypt.compare(
+    password,
+    user?.passwordHash ?? DUMMY_HASH,
+  );
 
-  if (!user || !passwordMatches) throw ApiError.unauthorized("Invalid email or password");
+  if (!user || !passwordMatches)
+    throw ApiError.unauthorized("Invalid email or password");
   if (!user.isActive) {
-    throw new ApiError(403, "This account has been disabled. Contact an administrator.", {
-      code: "ACCOUNT_DISABLED",
-    });
+    throw new ApiError(
+      403,
+      "This account has been disabled. Contact an administrator.",
+      {
+        code: "ACCOUNT_DISABLED",
+      },
+    );
   }
   return user.toJSON();
 }
@@ -48,7 +62,10 @@ export function verifyToken(token) {
     if (!claims.sub) throw new Error("missing subject");
     return claims;
   } catch (error) {
-    const message = error?.name === "TokenExpiredError" ? "Your session has expired" : "Invalid authentication token";
+    const message =
+      error?.name === "TokenExpiredError"
+        ? "Your session has expired"
+        : "Invalid authentication token";
     throw new ApiError(401, message, { code: ERROR_CODES.UNAUTHENTICATED });
   }
 }
